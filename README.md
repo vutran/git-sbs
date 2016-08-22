@@ -2,13 +2,17 @@
 
 > View git diffs side-by-side
 
+## Install
+
+```bash
+$ npm install -g git-sbs
+```
+
 ## Usage
 
 ```bash
 $ git sbs
 ```
-
-## This is cool!!!
 
 ## License
 
