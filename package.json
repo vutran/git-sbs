@@ -26,6 +26,6 @@
   "dependencies": {
     "blessed": "^0.1.81",
     "colors": "^1.1.2",
-    "git-parser": "^0.1.0"
+    "git-parser": "^0.1.1"
   }
 }
