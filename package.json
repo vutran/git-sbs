@@ -3,24 +3,29 @@
   "version": "0.1.0",
   "description": "View git diffs side-by-side",
   "keywords": [
-    "sbs",
+    "compare",
+    "comparison",
+    "diff",
     "git",
     "git sbs",
-    "diff",
-    "compare",
-    "comparison"
+    "sbs"
   ],
   "bin": {
-    "git-sbs": "git-sbs"
+    "git-sbs": "./cli.js"
   },
   "files": [
-    "git-sbs",
+    "index.js",
     "LICENSE",
     "README.md"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
   "author": "Vu Tran <vu@vu-tran.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "blessed": "^0.1.81",
+    "colors": "^1.1.2",
+    "git-parser": "^0.1.0"
+  }
 }
