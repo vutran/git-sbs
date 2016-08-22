@@ -1,0 +1,26 @@
+{
+  "name": "git-sbs",
+  "version": "0.1.0",
+  "description": "View git diffs side-by-side",
+  "keywords": [
+    "sbs",
+    "git",
+    "git sbs",
+    "diff",
+    "compare",
+    "comparison"
+  ],
+  "bin": {
+    "git-sbs": "git-sbs"
+  },
+  "files": [
+    "git-sbs",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Vu Tran <vu@vu-tran.com>",
+  "license": "MIT"
+}
