@@ -1,60 +1,72 @@
 const blessed = require('blessed');
 const colors = require('colors');
-const { parseDiff, parseHunk } = require('git-parser');
+const { parseDiff } = require('git-parser');
 const exec = require('child_process').exec;
 
-const screen = blessed.screen({
-  smartCSR: true,
-});
+let viewer = null;
 
-screen.title = 'Git Diff Side-By-Side';
+const createViewer = () => {
+  const screen = blessed.screen({
+    smartCSR: true,
+  });
 
-const left = blessed.box({
-  top: '0%',
-  left: '0%',
-  width: '50%',
-  height: '100%',
-  keys: true,
-  scrollable: true,
-  alwaysScroll: true,
-  // border: {
-  //   type: 'line',
-  // },
-  content: '',
-});
+  screen.title = 'Git Diff Side-By-Side';
 
-const right = blessed.box({
-  top: '0%',
-  left: '50%',
-  width: '50%',
-  height: '100%',
-  scrollable: true,
-  // border: {
-  //   type: 'line',
-  // },
-  content: '',
-});
+  const left = blessed.box({
+    top: '0%',
+    left: '0%',
+    width: '50%',
+    height: '100%',
+    keys: true,
+    scrollable: true,
+    alwaysScroll: true,
+    content: '',
+  });
 
-left.on('render', () => {
-  right.setScroll(left.getScroll());
-});
+  const right = blessed.box({
+    top: '0%',
+    left: '50%',
+    width: '50%',
+    height: '100%',
+    scrollable: true,
+    content: '',
+  });
 
-// Quit on Escape, q, or Control-C.
-screen.key(['escape', 'q', 'C-c'], function(ch, key) {
-  return process.exit(0);
-});
+  left.on('render', () => {
+    right.setScroll(left.getScroll());
+  });
 
-screen.append(left);
-screen.append(right);
+  // Quit on Escape, q, or Control-C.
+  screen.key(['escape', 'q', 'C-c'], function(ch, key) {
+    return process.exit(0);
+  });
+
+  screen.append(left);
+  screen.append(right);
+
+  return {
+    screen,
+    left,
+    right,
+  };
+
+};
+
+const render = () => {
+  if (viewer) {
+    viewer.screen.render();
+  }
+};
 
 module.exports = () => {
   exec('git diff', (err, stdout, stderr) => {
+    viewer = createViewer();
     const parsed = parseDiff(stdout);
     parsed.map((line, lineIndex) => {
       // retrieve existing content
-      let leftContent = left.getContent();
-      let rightContent = right.getContent();
-      // insert a new line for each bix
+      let leftContent = viewer.left.getContent();
+      let rightContent = viewer.right.getContent();
+      // insert a new line for each box
       let currLeftContent = '';
       let currRightContent = '';
       switch (line.type) {
@@ -70,17 +82,28 @@ module.exports = () => {
           currLeftContent = '';
           currRightContent = colors.green(`${line.number}\t${line.value}`);
           break;
+        case 'hunk':
+          // do nothing...
+          break;
+        case 'file':
+          if (line.data.type === 'from') {
+            currLeftContent = colors.blue(line.data.file);
+            currRightContent = colors.blue(line.data.file);
+          }
+          break;
         default:
           currLeftContent = line.value;
           currRightContent = line.value;
           break;
       }
-      // concat the existing content and current line
-      leftContent = leftContent + '\r\n' + currLeftContent;
-      rightContent = rightContent + '\r\n' + currRightContent;
-      left.setContent(leftContent);
-      right.setContent(rightContent);
+      if (currLeftContent || currRightContent) {
+        // concat the existing content and current line
+        leftContent = leftContent + "\r\n" + currLeftContent;
+        rightContent = rightContent + "\r\n" + currRightContent;
+      }
+      viewer.left.setContent(leftContent);
+      viewer.right.setContent(rightContent);
     });
-    screen.render();
+    render();
   });
 };
