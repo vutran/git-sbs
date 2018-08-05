@@ -61,6 +61,11 @@ const render = () => {
 module.exports = () => {
   exec('git diff', (err, stdout, stderr) => {
     viewer = createViewer();
+    if (!stdout.length) {
+      viewer.left.setContent('No changes');
+      render();
+      return;
+    }
     const parsed = parseDiff(stdout);
     parsed.map((line, lineIndex) => {
       // retrieve existing content
